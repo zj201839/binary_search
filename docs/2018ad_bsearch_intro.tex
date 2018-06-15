@@ -100,7 +100,10 @@
 
 \section{時間計算量のオーダー}
 アルゴリズムの計算量は通常オーダー記法$O(\cdot)$を用いて表わす。
-例えば最大公約数の計算。
+$f(n) = O(g(n)) \stackrel{\mathrm{def}}{\iff} \exists c>0, \forall n\ge 1, f(n) \le c g(n)$ という意味である。
+なので $n$ も $100000000000 n$も $O(n)$であるし、$\log n$ も $O(n)$ である(もちろん $\log n$ は $O(\log n)$でもある)。
+最大公約数の計算をするユークリッドの互除法と binary GCD は両方とも $O(n^2)$ である($n$は入力長であり、最大公約数を計算したい整数の桁数)。
+ただし、定数倍の差で binary GCD の方が通常のコンピュータで高速となる。
 
 \section{二分探索}
 ソートしてある整数の列$A_0\le A_1\le A_2\le \dotsb\le A_{n-1}$の中から、$x$以上である最小のものを見つける問題を考えよう。
@@ -123,7 +126,7 @@
 \begin{lstlisting}[basicstyle=\ttfamily\normalsize,showstringspaces=false,language=C,frame=single]
 int binary_search(int A[], int x, unsigned int l, unsigned int r){
   unsigned int m;
-  if(l >= r) return l;
+  if(l >= r) return r;
   m = (l + r) / 2; // 桁溢れを考慮すると m = l + (r - l) / 2
   if(A[m] >= x) return binary_search(A, x, l, m);
   else return binary_search(A, x, m + 1, r);
@@ -132,7 +135,7 @@ int binary_search(int A[], int x, unsigned int l, unsigned int r){
 便宜上$A_n=+\infty$として\textrm{bsearch}を定義したが、このアルゴリズムの中で\textbf{実際に$\mathtt{A[n]}$がアクセスされることはない}。
 
 \section{二分探索の時間計算量}
-一回の漸化式の適用で探索するべき候補は約半分になるので$\log n$回の漸化式の適用で終わる。
+一回の漸化式の適用で探索するべき候補は約半分になるので$O(\log n)$回(より具体的には$\lceil\log (n+1)\rceil$回)の漸化式の適用で停止する。
 
 \section{反復による二分探索}
 再帰によるプログラムを素直に反復に書き直すと次のようになる。
@@ -356,16 +359,16 @@ unsigned int binary_search(int A[], int x, int n){
 \section{二分探索の応用}
 二分探索はソートされた配列から値を探すという目的以外にも使用することができる。
 ソートされた配列の代わりに単調な二値関数$p\colon \{0,1,2,\dotsc,n-1\}\to\{0,1\}$について考えよう。
-ここで$p$が単調というのは$p(i)\ge p(i-1)$が$i=1,2,\dotsc,n-1$について満たされるという意味である。
+ここで$p$が単調というのは$p(x)\ge p(x-1)$が$x=1,2,\dotsc,n-1$について満たされるという意味である。
 このような$p$について
 \begin{center}
-$p(i) = 1$を満たす最小の$i\in\{0,1,2,\dotsc,n-1\}$をもとめよ
+$p(x) = 1$を満たす最小の$x\in\{0,1,2,\dotsc,n-1\}$をもとめよ
 \end{center}
 という問題を二分探索で解くことができる。
-具体的には前節のプログラムのうち5行目からの9行を次のように変更すればよい。
-\begin{lstlisting}[basicstyle=\ttfamily\small,showstringspaces=false,language=C,frame=single]
+具体的には前節のプログラムのうち4行目からの5行を次のように変更すればよい。
+\begin{lstlisting}[basicstyle=\ttfamily\normalsize,showstringspaces=false,language=C,frame=single]
 while(ub - lb > l) {
-  int m = (lb + ub) / 2;
+  unsigned int m = (lb + ub) / 2;
   if(p(m)) ub = m;
   else lb = m;
 }
@@ -391,7 +394,7 @@ p(x) =
 \end{cases}
 \end{equation*}
 この場合、
-\begin{lstlisting}[basicstyle=\ttfamily\small,showstringspaces=false,language=C,frame=single]
+\begin{lstlisting}[basicstyle=\ttfamily\normalsize,showstringspaces=false,language=C,frame=single]
 int p(unsigned int x){
   return x * x >= n;
 }
@@ -401,6 +404,6 @@ int p(unsigned int x){
 そうすると反復回数は$\lceil\log n\rceil$である。
 このように、\textbf{簡単に計算ができる単調な関数の逆関数は二分探索を用いて計算ができる}。
 ただし平方根の計算にはニュートン法というもっと効率的な方法が存在する。
-ニュートン法は関数(この場合$x^2$にあたるもの)の凸性も用いるので、二分探索の方が適用範囲が広い。
+しかしニュートン法は関数(この場合$x^2$にあたるもの)の凸性も用いるので、二分探索の方が適用範囲が広い。
 
 \end{document}
