@@ -155,10 +155,10 @@ unsigned int binary_search(int A[], int x, int n){
 次のようなプログラムを覚えるとよい。
 \begin{lstlisting}[basicstyle=\ttfamily\normalsize,showstringspaces=false,language=C,frame=single]
 unsigned int binary_search(int A[], int x, int n){
-  unsigned int lb = -1;
-  unsigned int ub = n;
+  int lb = -1;
+  int ub = n;
   while(ub - lb > 1){
-    unsigned int m = (lb + ub) / 2;
+    int m = (lb + ub) / 2;
     if(A[m] >= x) ub = m;
     else lb = m;
   }
