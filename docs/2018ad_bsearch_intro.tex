@@ -368,7 +368,7 @@ $p(x) = 1$を満たす最小の$x\in\{0,1,2,\dotsc,n-1\}$をもとめよ
 具体的には前節のプログラムのうち4行目からの5行を次のように変更すればよい。
 \begin{lstlisting}[basicstyle=\ttfamily\normalsize,showstringspaces=false,language=C,frame=single]
 while(ub - lb > l) {
-  unsigned int m = (lb + ub) / 2;
+  int m = (lb + ub) / 2;
   if(p(m)) ub = m;
   else lb = m;
 }
