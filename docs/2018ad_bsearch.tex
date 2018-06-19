@@ -1,0 +1,448 @@
+\documentclass[a4paper,twoside,onecolumn,openany,article,10pt]{memoir}
+\usepackage{xeCJK}
+\usepackage{url}
+\usepackage{hyperref}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amsthm}
+\usepackage{enumerate}
+%\usepackage{algorithm}
+%\usepackage{algorithmicx}
+%\usepackage{algpseudocode}
+\usepackage{ascmac}
+\usepackage{tikz}
+\usepackage{ulem}
+%\usepackage{stix}
+%\usepackage{bm}
+\defaultfontfeatures{Ligatures=TeX}
+
+\setCJKmainfont[BoldFont=Noto Sans CJK JP Bold]{Noto Serif CJK JP}
+%\setCJKmainfont{Noto Serif CJK JP}
+\setCJKsansfont{Noto Sans CJK JP}
+\setCJKmonofont{Noto Sans Mono CJK JP}
+
+\newtheorem{theorem}{定理}
+\theoremstyle{remark}
+\newtheorem{remark}{\textbf{余談}}
+
+
+%\setmainfont{DejaVu Serif}
+%\setsansfont{URW Gothic}
+%\setmainfont{Noto Serif CJK JP}
+\setmainfont[BoldFont=Noto Sans CJK JP Bold]{Noto Serif CJK JP}
+\setsansfont{Noto Sans CJK JP}
+\setmonofont{Inconsolata}
+
+\usepackage{listings}
+
+%\renewcommand{\algorithmcfname}{アルゴリズム}
+
+
+
+\settrimmedsize{\stockheight}{\stockwidth}{*}
+
+%\setlrmarginsandblock{1.5in}{1in}{*}
+\setlrmarginsandblock{1.2in}{1.2in}{*}
+\setulmarginsandblock{1.2in}{1.5in}{*}
+\setheadfoot{20mm}{15mm}
+
+%\newlength{\linespace}
+%\setlength{\linespace}{\baselineskip}
+%\setlength{\headheight}{\onelineskip}
+%\setlength{\headsep}{\linespace}
+%\addtolength{\headsep}{-\topskip}
+
+%\setlength{\footskip}{\onelineskip}
+%\setlength{\footnotesep}{\onelineskip}
+
+\checkandfixthelayout
+
+\counterwithout{section}{chapter}
+\setsecnumdepth{subsubsection}
+
+
+\title{アルゴリズムとデータ構造\\\vspace{.5em} \Large 二分探索の応用}
+\date{2018年6月19日}
+\author{森~立平\\ \texttt{mori@c.titech.ac.jp}}
+
+\begin{document}
+\maketitle
+
+
+\noindent
+今日のメッセージ
+\begin{itemize}
+\item \textbf{二分探索には様々な応用がある}
+\item \textbf{C言語は簡単}
+\end{itemize}
+
+\noindent
+今日の演習の目標
+\begin{itemize}
+\item 二分探索を応用したプログラムを書けるようになる
+\end{itemize}
+
+\noindent
+今日の主な演習課題(提出締切は来週火曜日正午(12:00))
+\begin{enumerate}
+\item 二分探索を応用したプログラムを書く
+\end{enumerate}
+
+\noindent
+今日の演習時間のワークフロー
+\begin{enumerate}
+\item \texttt{Algorithms--Datastructures/docs/git.pdf} を見て、\texttt{git}の使い方を覚える
+\item Git の資料にあるように、fork, clone, ファイルを編集, commit, push, pull request という流れで課題を提出する。
+\end{enumerate}
+
+\section{二分探索のC言語プログラム}
+前回説明したように単調な関数$p\colon \mathbb{Z}\to\{0,1\}$について、$p(z)=1$となる最小の$z\in\mathbb{Z}$を見つける二分探索のプログラムは次のようになる。
+\begin{lstlisting}[basicstyle=\ttfamily\normalsize,showstringspaces=false,language=C,frame=single]
+int lb, ub;
+lb = 「絶対にp(lb) == 0となる値」;
+ub = 「絶対にp(ub) == 1となる値」;
+while(ub - lb > 1) {
+  int m = (lb + ub) / 2;
+  if(p(m)){
+    ub = m;
+  }
+  else {
+    lb = m;
+  }
+}
+/* ここで ub が p(ub) == 1 となる最小の値
+          lb が p(lb) == 0 となる最大の値となっている */
+\end{lstlisting}
+
+例えば入力として整数$n\ge 1$をとり、$\lceil\sqrt{n}\rceil$を出力するプログラムは次のようになる。
+\begin{lstlisting}[basicstyle=\ttfamily\normalsize,showstringspaces=false,language=C,frame=single]
+#include <stdio.h>
+
+int n;
+
+int p(int m){
+  return (long long int) m * m >= n;
+}
+
+int main(){
+  int lb, ub;
+  scanf("%d", &n);
+  lb = 0;
+  ub = n;
+  while(ub - lb > 1) {
+    int m = (lb + ub) / 2;
+    if(p(m)){
+      ub = m;
+    }
+    else {
+      lb = m;
+    }
+  }
+  printf("%d\n", ub);
+  return 0;
+}
+\end{lstlisting}
+
+\begin{itemize}
+\item \texttt{\#include <stdio.h>} は毎回書くおまじない。入出力関係のライブラリを使うためのヘッダファイルの取り込み。これが無いと\texttt{scanf}や\texttt{printf}が使えない。
+\item \texttt{int n;} のような関数の外側にある変数は\textbf{グローバル変数}と呼ばれ、プログラムのどこからでもアクセスできる。
+\item \texttt{int main()} は\textbf{main関数}という特別な関数で、プログラムを実行するとこのmain関数が実行される。
+\item \texttt{int lb, ub;} のような関数の内側にある変数は\textbf{ローカル変数}と呼ばれ、その関数の内側からだけアクセスできる。
+\item \texttt{scanf("\%d", \&n);} は\textbf{標準入力から整数を読み込み}\texttt{n}に代入する命令文である。
+標準入力から整数を2つ読み込んで\texttt{int}型の変数\texttt{a}と\texttt{b}に代入したい場合は\texttt{scanf("\%d\%d", \&a, \&b);} とする。
+\item \texttt{printf("\%d\textbackslash n", \&n);} は標準出力へ整数\texttt{n}と改行コード \texttt{\textbackslash n}を出力する。
+\item \texttt{return 0;} はmain関数の最後に書いておこう(書かなくてもエラーが起きる訳ではないが)。これは「プログラムが正常に終了した」ということを表わしている。
+エラーで終了するときは\texttt{return 1;}など0以外の値を返すようにする。この授業ではエラーによる終了は扱わないので、main関数の最後に\texttt{return 0;}を書くことを覚えておけばよい。
+\end{itemize}
+他によくある処理として、最初に数列の長さ$n$を、その後に数列$A_0,\dotsc,A_{n-1}$を読み込みたい場合は
+\begin{lstlisting}[basicstyle=\ttfamily\normalsize,showstringspaces=false,language=C,frame=single]
+int i, n;
+scanf("%d", &n);
+for(i = 0; i < n; i++){
+  scanf("%d", &A[i]);
+}
+\end{lstlisting}
+とする。
+ここで
+\begin{lstlisting}[basicstyle=\ttfamily\normalsize,showstringspaces=false,language=C,frame=single]
+for(AAA; BBB; CCC){
+  DDD
+}
+\end{lstlisting}
+は
+\begin{lstlisting}[basicstyle=\ttfamily\normalsize,showstringspaces=false,language=C,frame=single]
+AAA;
+while(BBB){
+  DDD
+  CCC;
+}
+\end{lstlisting}
+と等価である。
+ここで、\texttt{AAA, BBB, CCC} はそれぞれ一つの文であり、\texttt{DDD}は文の列であるとする。
+
+標準入力とは特定のファイルなどではなくプログラムが受け付ける入力であり、\texttt{scanf}を用いたプログラムを
+実行すると入力受け付け状態になる。入力と改行(Enterキー)を入力すると、\texttt{scanf}により読み取られて残りの処理が実行される。
+毎回入力するのが面倒くさい場合はターミナルで \texttt{echo 100 | ./a.out} とすれば \texttt{./a.out} としてから 100 を入力してEnterを押すのと同じことになる。
+また、ファイル\texttt{file.txt}に入力を記入しておいてから、\texttt{./a.out < file.txt} としてもよい。
+
+\section{より高度な二分探索}
+二分探索とは、単調な関数$p\colon \mathbb{Z}\to\{0,1\}$について、$p(x)=1$となる最小の$x\in\mathbb{Z}$を見つけるアルゴリズムであった。
+この二分探索は適用範囲が広く、様々な応用がある。
+例えば、今回の課題(後述)の「りんご狩り」では
+\begin{equation*}
+p(x) := \begin{cases}
+1,& \text{if $x$個のりんごが入るりんごバッグを合計$k$個配ると全員がりんごを持って帰れる}\\
+0,& \text{otherwise.}
+\end{cases}
+\end{equation*}
+と定義すれば$p$は単調性を満たし、$p(x)=1$となる最小の$x$が求める解となる。
+この$p(x)$は効率的に計算することができるので、この問題を十分効率的に解くことができる。
+
+
+
+\clearpage
+\section{課題}\label{sec:assign}
+\subsection{配列の二分探索 $\bigstar$}
+\begin{itembox}[l]{問題文}
+単調非減少数列$a_0, a_1,\dotsc, a_{n-1}$と整数$k$について、$a_x\ge k$となる最小の整数$x$を求めよ。
+ただし、そのような$x$が存在しないときは$x=n$とする。
+\end{itembox}
+
+\begin{itembox}[l]{入力制約}
+$1\le n\le 10^5$\\
+$1\le k\le 10^9$\\
+$1\le a_i\le 10^9$,\hspace{2em} $i\in\{0,1,\dotsc,n-1\}$\\
+$a_i\le a_{i+1}$,\hspace{2em} $i\in\{0,1,\dotsc,n-2\}$
+\end{itembox}
+
+\begin{itembox}[l]{入力}
+$n~k$\\
+$a_0~a_1 \dotsb a_{n-1}$
+\end{itembox}
+
+\begin{itembox}[l]{出力}
+$x$
+\end{itembox}
+
+\begin{itembox}[l]{サンプル1}
+入力:
+\begin{verbatim}
+12 17
+1 2 4 4 5 9 10 14 19 30 72 99
+\end{verbatim}
+出力:
+\begin{verbatim}
+8
+\end{verbatim}
+\end{itembox}
+
+\begin{itembox}[l]{サンプル2}
+入力:
+\begin{verbatim}
+12 3
+1 2 4 4 5 9 10 14 19 30 72 99
+\end{verbatim}
+出力:
+\begin{verbatim}
+2
+\end{verbatim}
+\end{itembox}
+
+\begin{itembox}[l]{サンプル3}
+入力:
+\begin{verbatim}
+1 10
+9
+\end{verbatim}
+出力:
+\begin{verbatim}
+1
+\end{verbatim}
+\end{itembox}
+
+\clearpage
+\subsection{りんご狩り $\bigstar\bigstar$}
+\begin{itembox}[l]{問題文}
+りんご狩りに$n$人集まった。
+各$i=1,2,\dotsc,n$について$i$番目の人は$a_i$個のりんごを収穫した。
+合計$k$個のりんごバッグ(サイズは全て同じ)を配ると、全ての人はりんごを持ち帰ることができた。
+りんごバッグに入れることができるりんごの個数としてあり得るもののうち最小値$x$をもとめよ。
+\end{itembox}
+
+\begin{itembox}[l]{入力制約}
+$1\le n\le 10^5$\\
+$1\le a_i\le 10^9$,\hspace{2em}$i\in\{1,2,\dotsc,n\}$\\
+$n\le k\le 10^5$
+\end{itembox}
+
+\begin{itembox}[l]{入力}
+$n~k$\\
+$a_1~a_2 \dotsb a_n$
+\end{itembox}
+
+\begin{itembox}[l]{出力}
+$x$
+\end{itembox}
+
+\begin{itembox}[l]{サンプル1}
+入力:
+\begin{verbatim}
+5 7
+1 2 3 4 5
+\end{verbatim}
+出力:
+\begin{verbatim}
+3
+\end{verbatim}
+\end{itembox}
+
+\begin{itembox}[l]{サンプル2}
+入力:
+\begin{verbatim}
+5 5
+10 20 30 40 1000
+\end{verbatim}
+出力:
+\begin{verbatim}
+1000
+\end{verbatim}
+\end{itembox}
+
+\begin{itembox}[l]{サンプル3}
+入力:
+\begin{verbatim}
+7 1000
+1 2 3 4 5 6 7
+\end{verbatim}
+出力:
+\begin{verbatim}
+1
+\end{verbatim}
+\end{itembox}
+
+
+\clearpage
+\subsection{槍作り $\bigstar\bigstar$}
+\begin{itembox}[l]{問題文}
+長さ$m$の木から長さ$x$の木製の槍が$\lfloor m/x\rfloor$本作れる。
+今$n$本の木があり、各木の長さは$a_1,a_2,\dotsc,a_n$である。
+これらの木を切り同じ長さの木製の槍を$k$本作りたい。
+作ることができる槍の長さの最大値$x$をもとめよ。
+\end{itembox}
+
+\begin{itembox}[l]{入力制約}
+$1\le n\le 10^5$\\
+$1\le a_i\le 10^9$,\hspace{2em}$i\in\{1,2,\dotsc,n\}$\\
+$1\le k\le 10^5$
+\end{itembox}
+
+\begin{itembox}[l]{入力}
+$n~k$\\
+$a_1~a_2 \dotsb a_n$
+\end{itembox}
+
+\begin{itembox}[l]{出力}
+$x$
+\end{itembox}
+
+\begin{itembox}[l]{サンプル1}
+入力:
+\begin{verbatim}
+5 7
+1 2 3 4 5
+\end{verbatim}
+出力:
+\begin{verbatim}
+1
+\end{verbatim}
+\end{itembox}
+
+\begin{itembox}[l]{サンプル2}
+入力:
+\begin{verbatim}
+5 5
+10 20 30 40 1000
+\end{verbatim}
+出力:
+\begin{verbatim}
+200
+\end{verbatim}
+\end{itembox}
+
+\begin{itembox}[l]{サンプル3}
+入力:
+\begin{verbatim}
+7 1000
+1 2 3 4 5 6 7
+\end{verbatim}
+出力:
+\begin{verbatim}
+0
+\end{verbatim}
+\end{itembox}
+
+
+
+\clearpage
+\subsection{仕事配分 $\bigstar\bigstar$}
+\begin{itembox}[l]{問題文}
+$n$時間の仕事を$k$人の人に分配したい。
+それぞれの人は連続した何時間かを働き、また異る人が同時に働くことはないものとする。
+各時間の仕事量を整数列$a_1,a_2,\dotsc,a_n$とするとき、一番仕事量が多い人の仕事量を最小化するように仕事を配分するとする。
+そのような仕事配分をしたとき、一番仕事量が多い人の仕事量$x$をもとめよ。
+\end{itembox}
+
+\begin{itembox}[l]{入力制約}
+$1\le n\le 10^5$\\
+$1\le a_i\le 10^4$,\hspace{2em}$i\in\{1,2,\dotsc,n\}$\\
+$1\le k\le n$
+\end{itembox}
+
+\begin{itembox}[l]{入力}
+$n~k$\\
+$a_1~a_2 \dotsb a_n$
+\end{itembox}
+
+\begin{itembox}[l]{出力}
+$x$
+\end{itembox}
+
+\begin{itembox}[l]{サンプル1}
+入力:
+\begin{verbatim}
+3 2
+1 2 4
+\end{verbatim}
+出力:
+\begin{verbatim}
+4
+\end{verbatim}
+\end{itembox}
+
+\begin{itembox}[l]{サンプル2}
+入力:
+\begin{verbatim}
+3 2
+1 4 2
+\end{verbatim}
+出力:
+\begin{verbatim}
+5
+\end{verbatim}
+\end{itembox}
+
+\begin{itembox}[l]{サンプル3}
+入力:
+\begin{verbatim}
+5 5
+10 20 30 40 1000
+\end{verbatim}
+出力:
+\begin{verbatim}
+1000
+\end{verbatim}
+\end{itembox}
+
+
+
+\end{document}
