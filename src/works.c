@@ -8,13 +8,11 @@ int p(int m){
     int person = 0;
     int i = 0;
     int sum = 0;
-    while(i <= n){
+    while(i < n){
         while(sum<=m && i <=n){
             
             if(A[i]>m){
-                sum = m+1;
-                i = n+10;
-                person = k+1;
+               return 0;
             }
                 
               sum=sum+A[i];
