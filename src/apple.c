@@ -9,7 +9,7 @@ int p(int m){
     int i;
     for(i = 0 ; i < n ; i++){
       if(A[i]%m == 0){
-        use = use+A[i]/m;
+        use += A[i]/m;
     }
     else{
         use = use+A[i]/m+1;
