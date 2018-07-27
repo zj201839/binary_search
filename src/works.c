@@ -9,43 +9,39 @@ int p(int m){
     int i = 0;
     int sum = 0;
     while(i < n){
-        while(sum<=m && i <=n){
-            
+        while(sum<=m && i <n){
             if(A[i]>m){
                return 0;
-            }
-                
-              sum=sum+A[i];
-                          if(sum<=m){
-                                          i = i+1;
-                            }
-            
+            }   
+            sum += A[i];
+            if(sum<=m){
+              i = i+1;
+            }    
         }
-         sum = 0;
-        person = person+1;
+        sum = 0;
+        person += 1;
     }
-
-        return person<=k;
+    return person<=k;
 }
 
 int main(){
   int i, lb, ub;
   scanf("%d%d", &n, &k);
   lb = 0;
-  ub = 10000;
+  ub = 1000000000;
   for(i = 0; i < n; i++){
     scanf("%d", &A[i]);
   }
-    while(ub-lb>1){
+  while(ub-lb>1){
     int m = (ub+lb)/2;
-  if(p(m)){
-    ub = m;
-}
-else {
-    lb = m;
-}
-}
-printf("%d\n",ub);
+    if(p(m)){
+      ub = m;
+    }
+    else {
+      lb = m;
+    }
+  }
+  printf("%d\n",ub);
 
 
 
