@@ -15,7 +15,7 @@ int main(){
   }
   while(ub-lb>1){
     int m = (ub+lb)/2;
-    if(A[m]<=k){
+    if(A[m]<k){
         lb = m;
     }
     else{
